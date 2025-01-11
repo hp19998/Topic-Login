@@ -1,0 +1,71 @@
+Topic :
+Adapting Intrusion Detection: A Comparative Study of Suricata and Snort in Dynamic Network Environments | Domain (Advanced computer science masters project) | Major (cyber Security)
+
+Description:
+With complete work, please provide artefact in .TXT format 
+
+
+Generic Description:
+The topic of this research is to analyze how two popular intrusion detection systems, Suricata and Snort, adapt to the challenges posed by growing network environments. With the rapid expansion of networks and the increasing complexity of cyber threats, it is essential to evaluate the effectiveness and efficiency of these intrusion detection systems. This study aims to investigate how Suricata and Snort handle the demands of large-scale and dynamic network environments, including high-speed traffic, diverse protocols, and emerging threat patterns. The research will explore the adaptability of these systems in terms of scalability, performance optimization, rule management, and real-time threat detection. The findings will provide valuable insights into enhancing the capabilities of Suricata and Snort for efficient intrusion detection in evolving network landscapes.
+
+
+
+Aws details 
+ID - harshaprasad1998@gmail.com
+PW -  Diss123@
+
+SNORTVM- 16.16.24.189
+
+SURICATA VM - 13.53.190.222
+sudo apt update
+sudo apt install apache2
+sudo apt install vsftpd -y
+sudo apt install snort -y
+snort --version
+sudo snort -T -c /etc/snort/snort.conf
+sudo snort -A console -q -c /etc/snort/snort.conf -i ens5
+
+# Rules for HTTP Traffic
+alert tcp any 80 -> any any (msg:"HTTP Traffic Detected"; flow:to_server,established; content:"HTTP"; http_method; sid:1000001;)
+
+# Rules for FTP Traffic
+alert tcp any 21 -> any any (msg:"FTP Traffic Detected"; flow:to_server,established; content:"220 "; sid:1000002;)
+
+# Rules for DoS/DDoS
+alert tcp any any -> any 80 (msg:"Possible SYN Flood detected"; flags:S; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000010;)
+alert tcp any 80 -> any any (msg:"Possible HTTP Flood attack detected"; flow:to_server,established; content:"GET "; http_uri; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000020;)
+alert udp any 53 -> any any (msg:"DNS Amplification attack detected"; threshold:type threshold, track by_src, count 200, seconds 1; sid:1000030;)
+alert icmp any any -> any any (msg:"ICMP Flood attack detected"; itype:8; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000040;)
+alert ip any any -> any any (msg:"Possible DDoS traffic detected"; threshold:type threshold, track by_src, count 1000, seconds 5; sid:1000050;)
+
+
+
+Suricata
+
+sudo apt update
+sudo apt install suricata -y
+sudo apt install libpcap-dev libpcre3-dev libnet1-dev libyaml-dev libmagic-dev zlib1g-dev python3-dev -y
+suricata --build-info
+sudo systemctl start suricata
+sudo systemctl enable suricata
+sudo systemctl status suricata
+sudo nano /etc/suricata/suricata.yaml
+sudo suricata-update
+
+cd /etc/suricata/rules/
+
+tail -f /var/log/suricata/suricata.log
+
+sudo suricata -i ens5 -v
+
+alert tcp any any -> any 80 (msg:"HTTP Server Detected"; flow:to_server,established; content:"GET"; http_method; sid:1000001;)
+alert tcp any any -> any 80 (msg:"HTTP Server Detected"; flow:to_server,established; content:"POST"; http_method; sid:1000002;)
+
+
+alert tcp any any -> any 21 (msg:"FTP Server Detected"; flow:to_server,established; content:"220 "; sid:1000003;)
+
+alert tcp any any -> any 80 (msg:"Possible SYN Flood detected"; flags:S; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000010;)
+alert tcp any any -> any 80 (msg:"Possible HTTP Flood attack detected"; flow:to_server,established; content:"GET "; http_uri; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000020;)
+alert tcp any any -> any 80 (msg:"Possible HTTP Flood attack detected"; flow:to_server,established; content:"POST "; http_uri; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000021;)
+alert udp any any -> any 53 (msg:"Possible DNS Amplification attack detected"; threshold:type threshold, track by_src, count 200, seconds 1; sid:1000030;)
+alert icmp any any -> any any (msg:"Possible ICMP Flood attack detected"; itype:8; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000040;)

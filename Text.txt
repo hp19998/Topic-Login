@@ -1,0 +1,225 @@
+sudo apt update
+sudo apt install apache2
+sudo apt install vsftpd -y
+sudo apt install snort -y
+snort --version
+sudo snort -T -c /etc/snort/snort.conf
+sudo snort -A console -q -c /etc/snort/snort.conf -i ens5
+
+# Rules for HTTP Traffic
+alert tcp any any -> any 80 (msg:"HTTP Traffic Detected"; sid:1000001; rev:1;)
+alert tcp any any -> any 443 (msg:"HTTPS Traffic Detected"; sid:1000002; rev:1;)
+# Rules for FTP Traffic
+alert tcp any any -> any 21 (msg:"FTP Traffic Detected"; sid:1000003; rev:1;)
+alert tcp any any -> any 20 (msg:"FTP Data Traffic Detected"; sid:1000004; rev:1;)
+# Rules for DoS/DDoS
+alert tcp any any -> any 80 (msg:"Possible SYN Flood detected"; flags:S; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000010;)
+alert tcp any 80 -> any any (msg:"Possible HTTP Flood attack detected"; flow:to_server,established; content:"GET "; http_uri; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000020;)
+alert udp any 53 -> any any (msg:"DNS Amplification attack detected"; threshold:type threshold, track by_src, count 200, seconds 1; sid:1000030;)
+alert icmp any any -> any any (msg:"ICMP Flood attack detected"; itype:8; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000040;)
+alert ip any any -> any any (msg:"Possible DDoS traffic detected"; threshold:type threshold, track by_src, count 1000, seconds 5; sid:1000050;)
+
+
+
+ubuntu@ip-172-31-24-164:~$ sudo snort -A console -q -c /etc/snort/snort.conf -i ens5
+12/25-05:17:30.135496  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:24886 -> 172.31.24.164:80
+12/25-05:17:30.144392  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:32031 -> 172.31.24.164:80
+12/25-05:17:31.298653  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:13767 -> 172.31.24.164:80
+12/25-05:17:31.306627  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:30710 -> 172.31.24.164:80
+12/25-05:17:31.319152  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:19421 -> 172.31.24.164:80
+12/25-05:17:31.394846  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:28702 -> 172.31.24.164:80
+12/25-05:17:31.559537  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:16072 -> 172.31.24.164:80
+12/25-05:17:31.560403  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29063 -> 172.31.24.164:80
+12/25-05:17:31.621086  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:21234 -> 172.31.24.164:80
+12/25-05:17:31.630663  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29413 -> 172.31.24.164:80
+12/25-05:17:31.674891  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:33018 -> 172.31.24.164:80
+12/25-05:17:31.706165  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:14181 -> 172.31.24.164:80
+12/25-05:17:31.901765  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:6842 -> 172.31.24.164:80
+12/25-05:17:33.356550  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:23244 -> 172.31.24.164:80
+12/25-05:17:33.359667  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:19525 -> 172.31.24.164:80
+12/25-05:17:33.365398  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:27244 -> 172.31.24.164:80
+12/25-05:17:33.624166  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:2101 -> 172.31.24.164:80
+12/25-05:17:33.857624  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:32548 -> 172.31.24.164:80
+12/25-05:17:35.311335  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:17221 -> 172.31.24.164:80
+12/25-05:17:35.311559  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:12975 -> 172.31.24.164:80
+12/25-05:17:35.312297  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:14035 -> 172.31.24.164:80
+12/25-05:17:35.315386  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:27091 -> 172.31.24.164:80
+12/25-05:17:35.319391  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:7922 -> 172.31.24.164:80
+12/25-05:17:35.319448  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:26208 -> 172.31.24.164:80
+12/25-05:17:35.319548  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:13180 -> 172.31.24.164:80
+12/25-05:17:35.320420  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:9671 -> 172.31.24.164:80
+12/25-05:17:35.345819  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:31268 -> 172.31.24.164:80
+12/25-05:17:35.366636  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:23220 -> 172.31.24.164:80
+12/25-05:17:35.429210  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:14233 -> 172.31.24.164:80
+12/25-05:17:35.437439  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:2566 -> 172.31.24.164:80
+12/25-05:17:35.442838  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:5167 -> 172.31.24.164:80
+12/25-05:17:35.452679  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:11848 -> 172.31.24.164:80
+12/25-05:17:35.592185  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:26616 -> 172.31.24.164:80
+12/25-05:17:37.295441  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:8909 -> 172.31.24.164:80
+12/25-05:17:37.296433  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:31930 -> 172.31.24.164:80
+12/25-05:17:37.296515  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:30372 -> 172.31.24.164:80
+12/25-05:17:37.298314  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:19945 -> 172.31.24.164:80
+12/25-05:17:37.300162  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:31317 -> 172.31.24.164:80
+12/25-05:17:37.302032  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:10523 -> 172.31.24.164:80
+12/25-05:17:37.302590  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:25153 -> 172.31.24.164:80
+12/25-05:17:37.302861  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29431 -> 172.31.24.164:80
+12/25-05:17:37.304280  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:26867 -> 172.31.24.164:80
+12/25-05:17:37.305922  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29621 -> 172.31.24.164:80
+12/25-05:17:37.308757  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:1223 -> 172.31.24.164:80
+12/25-05:17:37.312424  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:9611 -> 172.31.24.164:80
+12/25-05:17:37.346841  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:1497 -> 172.31.24.164:80
+12/25-05:17:37.426718  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:10126 -> 172.31.24.164:80
+12/25-05:17:37.430957  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:22475 -> 172.31.24.164:80
+12/25-05:17:37.435434  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:5472 -> 172.31.24.164:80
+12/25-05:17:37.691196  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:28175 -> 172.31.24.164:80
+12/25-05:17:37.761984  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:10628 -> 172.31.24.164:80
+12/25-05:17:37.833626  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:4461 -> 172.31.24.164:80
+12/25-05:17:37.844598  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:20962 -> 172.31.24.164:80
+12/25-05:17:37.900959  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:12174 -> 172.31.24.164:80
+12/25-05:17:37.903318  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:30185 -> 172.31.24.164:80
+12/25-05:17:37.942904  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:28200 -> 172.31.24.164:80
+12/25-05:17:37.959816  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:9709 -> 172.31.24.164:80
+12/25-05:17:39.296427  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:32946 -> 172.31.24.164:80
+12/25-05:17:39.297921  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:14829 -> 172.31.24.164:80
+12/25-05:17:39.298384  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:25978 -> 172.31.24.164:80
+12/25-05:17:39.300291  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:30827 -> 172.31.24.164:80
+12/25-05:17:39.301070  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:6989 -> 172.31.24.164:80
+12/25-05:17:39.301197  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:14474 -> 172.31.24.164:80
+12/25-05:17:39.301558  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:26699 -> 172.31.24.164:80
+12/25-05:17:39.301808  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:22990 -> 172.31.24.164:80
+12/25-05:17:39.302184  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:31565 -> 172.31.24.164:80
+12/25-05:17:39.303772  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29733 -> 172.31.24.164:80
+12/25-05:17:39.303829  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:11606 -> 172.31.24.164:80
+12/25-05:17:39.305132  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:14828 -> 172.31.24.164:80
+12/25-05:17:39.305193  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:21551 -> 172.31.24.164:80
+12/25-05:17:39.305782  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:16076 -> 172.31.24.164:80
+12/25-05:17:39.305884  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:32039 -> 172.31.24.164:80
+12/25-05:17:39.306702  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:2043 -> 172.31.24.164:80
+12/25-05:17:39.306997  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:16226 -> 172.31.24.164:80
+12/25-05:17:39.308626  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:4900 -> 172.31.24.164:80
+12/25-05:17:39.309176  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:15411 -> 172.31.24.164:80
+12/25-05:17:39.309514  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:11797 -> 172.31.24.164:80
+12/25-05:17:39.309713  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:15584 -> 172.31.24.164:80
+12/25-05:17:39.385344  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:28033 -> 172.31.24.164:80
+12/25-05:17:39.695908  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:16127 -> 172.31.24.164:80
+12/25-05:17:39.719582  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:4125 -> 172.31.24.164:80
+12/25-05:17:39.722335  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:33214 -> 172.31.24.164:80
+12/25-05:17:39.734570  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:15020 -> 172.31.24.164:80
+12/25-05:17:39.760942  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:5587 -> 172.31.24.164:80
+12/25-05:17:39.904288  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29099 -> 172.31.24.164:80
+12/25-05:17:41.325833  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:29896 -> 172.31.24.164:80
+12/25-05:17:41.733968  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:21893 -> 172.31.24.164:80
+12/25-05:17:41.880765  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:2330 -> 172.31.24.164:80
+12/25-05:17:43.297526  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:30203 -> 172.31.24.164:80
+12/25-05:17:43.321910  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:20869 -> 172.31.24.164:80
+12/25-05:17:43.322661  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:9462 -> 172.31.24.164:80
+12/25-05:17:43.323473  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:30466 -> 172.31.24.164:80
+12/25-05:17:43.330229  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:3110 -> 172.31.24.164:80
+12/25-05:17:43.335224  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:13660 -> 172.31.24.164:80
+12/25-05:17:43.389662  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:7729 -> 172.31.24.164:80
+12/25-05:17:43.391005  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:7324 -> 172.31.24.164:80
+^C^C*** Caught Int-Signal
+12/25-05:17:43.419475  [**] [1:1000001:1] HTTP Traffic Detected [**] [Priority: 0] {TCP} 122.173.24.16:13949 -> 172.31.24.164:80
+ubuntu@ip-172-31-24-164:~$ sudo nano /etc/snort/rules/local.rules
+ubuntu@ip-172-31-24-164:~$ sudo snort -A console -q -c /etc/snort/snort.conf -i ens5
+12/25-05:18:27.096382  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:13179 -> 172.31.24.164:80
+12/25-05:18:27.119444  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:2658 -> 172.31.24.164:80
+12/25-05:18:27.140536  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:11581 -> 172.31.24.164:80
+12/25-05:18:27.161568  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:5919 -> 172.31.24.164:80
+12/25-05:18:27.182793  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:6922 -> 172.31.24.164:80
+12/25-05:18:27.202768  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:12819 -> 172.31.24.164:80
+12/25-05:18:27.223652  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:11861 -> 172.31.24.164:80
+12/25-05:18:27.251180  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:20685 -> 172.31.24.164:80
+12/25-05:18:27.278867  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:6134 -> 172.31.24.164:80
+12/25-05:18:27.323185  [**] [1:1000050:0] Possible DDoS traffic detected [**] [Priority: 0] {TCP} 122.173.24.16:10819 -> 172.31.24.164:80
+12/25-05:18:27.323573  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:3882 -> 172.31.24.164:80
+12/25-05:18:27.354147  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:3564 -> 172.31.24.164:80
+12/25-05:18:27.387292  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:13674 -> 172.31.24.164:80
+12/25-05:18:27.420073  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:21554 -> 172.31.24.164:80
+12/25-05:18:27.451903  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:20440 -> 172.31.24.164:80
+12/25-05:18:27.490596  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:24344 -> 172.31.24.164:80
+12/25-05:18:27.521559  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:19989 -> 172.31.24.164:80
+12/25-05:18:59.383062  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:24738 -> 172.31.24.164:80
+12/25-05:18:59.427737  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:8503 -> 172.31.24.164:80
+12/25-05:18:59.451465  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:27136 -> 172.31.24.164:80
+12/25-05:18:59.492865  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:15692 -> 172.31.24.164:80
+12/25-05:18:59.514859  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:32242 -> 172.31.24.164:80
+12/25-05:18:59.565294  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:30110 -> 172.31.24.164:80
+12/25-05:18:59.593990  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:6936 -> 172.31.24.164:80
+12/25-05:18:59.631704  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:7532 -> 172.31.24.164:80
+12/25-05:18:59.660041  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:4303 -> 172.31.24.164:80
+12/25-05:18:59.695567  [**] [1:1000050:0] Possible DDoS traffic detected [**] [Priority: 0] {TCP} 122.173.24.16:31580 -> 172.31.24.164:80
+12/25-05:18:59.701653  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:2496 -> 172.31.24.164:80
+12/25-05:18:59.734616  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:1423 -> 172.31.24.164:80
+12/25-05:18:59.767413  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:26074 -> 172.31.24.164:80
+12/25-05:18:59.807648  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:14086 -> 172.31.24.164:80
+12/25-05:18:59.841234  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:23941 -> 172.31.24.164:80
+12/25-05:18:59.878023  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:6160 -> 172.31.24.164:80
+12/25-05:18:59.915358  [**] [1:1000010:0] Possible SYN Flood detected [**] [Priority: 0] {TCP} 122.173.24.16:27415 -> 172.31.24.164:80
+
+
+Suricata
+
+sudo apt update
+sudo apt install suricata -y
+sudo apt install libpcap-dev libpcre3-dev libnet1-dev libyaml-dev libmagic-dev zlib1g-dev python3-dev -y
+suricata --build-info
+sudo systemctl start suricata
+sudo systemctl enable suricata
+sudo systemctl status suricata
+sudo nano /etc/suricata/suricata.yaml
+sudo suricata-update
+
+cd /etc/suricata/rules/
+
+tail -f /var/log/suricata/suricata.log
+
+sudo suricata -i ens5 -v
+
+alert tcp any any -> any 80 (msg:"HTTP Server Detected"; flow:to_server,established; content:"GET"; http_method; sid:1000001;)
+alert tcp any any -> any 80 (msg:"HTTP Server Detected"; flow:to_server,established; content:"POST"; http_method; sid:1000002;)
+
+
+alert tcp any any -> any 21 (msg:"FTP Server Detected"; flow:to_server,established; content:"220 "; sid:1000003;)
+
+alert tcp any any -> any 80 (msg:"Possible SYN Flood detected"; flags:S; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000010;)
+alert tcp any any -> any 80 (msg:"Possible HTTP Flood attack detected"; flow:to_server,established; content:"GET "; http_uri; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000020;)
+alert tcp any any -> any 80 (msg:"Possible HTTP Flood attack detected"; flow:to_server,established; content:"POST "; http_uri; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000021;)
+alert udp any any -> any 53 (msg:"Possible DNS Amplification attack detected"; threshold:type threshold, track by_src, count 200, seconds 1; sid:1000030;)
+alert icmp any any -> any any (msg:"Possible ICMP Flood attack detected"; itype:8; threshold:type threshold, track by_src, count 100, seconds 1; sid:1000040;)
+
+ubuntu@ip-172-31-23-236:~$ tail -f /var/log/suricata/fast.log
+12/25/2024-06:47:20.879460  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:31811 -> 172.31.23.236:80
+12/25/2024-06:47:21.224960  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:4355 -> 172.31.23.236:80
+12/25/2024-06:47:21.343631  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:31811 -> 172.31.23.236:80
+12/25/2024-06:48:02.844516  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:34848 -> 169.254.169.254:80
+12/25/2024-06:49:02.548822  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:40926 -> 169.254.169.254:80
+12/25/2024-06:50:03.132226  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:58846 -> 169.254.169.254:80
+12/25/2024-06:51:02.259470  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:39332 -> 169.254.169.254:80
+12/25/2024-06:52:02.487263  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:50776 -> 169.254.169.254:80
+12/25/2024-06:53:03.025427  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:60078 -> 169.254.169.254:80
+12/25/2024-06:53:19.709880  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:54682 -> 169.254.169.254:80
+12/25/2024-06:54:02.968156  [**] [1:1000001:0] HTTP Server Detected [**] [Classification: (null)] [Priority: 3] {TCP} 172.31.23.236:42154 -> 169.254.169.254:80
+12/25/2024-06:54:28.324413  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:23441 -> 172.31.23.236:80
+12/25/2024-06:54:28.347174  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:2030 -> 172.31.23.236:80
+12/25/2024-06:54:28.366866  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:17260 -> 172.31.23.236:80
+12/25/2024-06:54:28.388293  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:22915 -> 172.31.23.236:80
+12/25/2024-06:54:28.411136  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:31830 -> 172.31.23.236:80
+12/25/2024-06:54:28.430561  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:20934 -> 172.31.23.236:80
+12/25/2024-06:54:28.451818  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:25434 -> 172.31.23.236:80
+12/25/2024-06:54:28.476393  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:31208 -> 172.31.23.236:80
+12/25/2024-06:54:28.503950  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:4202 -> 172.31.23.236:80
+12/25/2024-06:54:28.546762  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:20824 -> 172.31.23.236:80
+12/25/2024-06:54:28.580001  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:7123 -> 172.31.23.236:80
+12/25/2024-06:54:28.616085  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:10676 -> 172.31.23.236:80
+12/25/2024-06:54:28.650212  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:28794 -> 172.31.23.236:80
+12/25/2024-06:54:28.679816  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:30438 -> 172.31.23.236:80
+12/25/2024-06:54:28.725266  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:28279 -> 172.31.23.236:80
+12/25/2024-06:54:28.752292  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:2765 -> 172.31.23.236:80
+12/25/2024-06:54:28.788887  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:19547 -> 172.31.23.236:80
+12/25/2024-06:54:28.821082  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:25284 -> 172.31.23.236:80
+12/25/2024-06:54:28.851963  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:14770 -> 172.31.23.236:80
+12/25/2024-06:54:28.884580  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:10773 -> 172.31.23.236:80
+12/25/2024-06:54:28.922627  [**] [1:1000010:0] Possible SYN Flood detected [**] [Classification: (null)] [Priority: 3] {TCP} 122.173.24.16:12637 -> 172.31.23.236:80
+
+
